@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>State Leader Lookup</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-top: 2px solid red;
+      border-bottom: 2px solid red;
+      border-collapse: collapse;
+    }
+    td {
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .highlight {
+      background-color: rgba(255, 0, 0, 0.15);
+    }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+      padding: 20px;
+      border: 2px solid red;
+      border-radius: 10px;
+      display: none;
+      z-index: 100;
+      width: 300px;
+      max-width: 90%;
+    }
+    #popup-close {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      color: red;
+    }
+    a {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Your Elected Officials</h2>
+<table id="results-table"></table>
+
+<div id="popup">
+  <span id="popup-close" onclick="closePopup()">X</span>
+  <div id="popup-content"></div>
+</div>
+
+<script>
+const highlightedNames = [
+  "Mitch McConnell", "Lisa Murkowski", "Don Bacon", "David Valadao",
+  "Mike Simpson", "Susan Collins", "John Curtis", "Jasmine Crockett",
+  "Ilhan Omar", "Rashida Tlaib", "Chuck Schumer", "Adam Schiff",
+  "AOC", "Hakeem Jeffries", "Cory Booker", "Al Green"
+];
+
+window.addEventListener("message", (event) => {
+  const data = event.data;
+  if (!Array.isArray(data)) return;
+
+  const table = document.getElementById('results-table');
+  table.innerHTML = '';
+
+  if (data.length === 0) {
+    table.innerHTML = '<tr><td>No officials found.</td></tr>';
+    return;
+  }
+
+  data.forEach(pol => {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.textContent = `${pol.office}: ${pol.name}`;
+    cell.onclick = () => showPopup(pol);
+    if (highlightedNames.includes(pol.name)) {
+      row.classList.add('highlight');
+    }
+    row.appendChild(cell);
+    table.appendChild(row);
+  });
+});
+
+function showPopup(pol) {
+  const popup = document.getElementById('popup');
+  const content = document.getElementById('popup-content');
+  content.innerHTML = `
+    <strong>Name:</strong> ${pol.name}<br>
+    <strong>Office:</strong> ${pol.office}<br>
+    <strong>Party:</strong> ${pol.party}<br>
+    <strong>Phone:</strong> ${pol.phone}<br>
+    <strong>Website:</strong> ${
+      pol.url ? `<a href="${pol.url}" target="_blank">View</a>` : 'N/A'
+    }
+  `;
+  popup.style.display = 'block';
+}
+
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
